@@ -597,7 +597,6 @@ del x
 
 ```
 
----
 
 ### **Type Hints (Optional)**
 
@@ -610,5 +609,100 @@ name: str = "Alice"
 
 These hints don’t enforce types at runtime but help tools (like IDEs) check your code.
 ****
+
+### Falsy Values in Python
+
+1. **Boolean `False`**
+    
+    ```python
+    if False:
+        print("Won't run")
+    
+    ```
+    
+2. **`None`**
+    
+    ```python
+    if None:
+        print("Won't run")
+    
+    ```
+    
+3. **Zero of any numeric type**
+    - `0` (int)
+    - `0.0` (float)
+    - `0j` (complex)
+    - `Decimal(0)` (from `decimal`)
+    - `Fraction(0, 1)` (from `fractions`)
+    
+    ```python
+    if 0:
+        print("Nope")
+    
+    ```
+    
+4. **Empty sequences/collections**
+    - Empty string: `""`
+    - Empty list: `[]`
+    - Empty tuple: `()`
+    - Empty set: `set()`
+    - Empty dict: `{}`
+    - Empty range: `range(0)`
+    
+    ```python
+    if []:
+        print("Nope")
+    
+    ```
+    
+5. **Objects that define `__bool__()` or `__len__()` returning `False` or `0`**
+    
+    ```python
+    class Empty:
+        def __len__(self):
+            return 0
+    
+    if Empty():
+        print("Nope")
+    
+    ```
+    
+
+---
+
+### ✅ Everything Else is Truthy
+
+Any value not on that list will be treated as `True` in a Boolean context, including non-empty strings, non-zero numbers, non-empty collections, and custom objects that don’t override truthiness.
+
+---
+
+🔎 Example:
+
+```python
+values = [False, None, 0, 0.0, "", [], {}, set(), (), range(0)]
+
+for v in values:
+    if v:
+        print(f"{repr(v)} is Truthy")
+    else:
+        print(f"{repr(v)} is Falsy")
+
+```
+
+Output:
+
+```
+False is Falsy
+None is Falsy
+0 is Falsy
+0.0 is Falsy
+'' is Falsy
+[] is Falsy
+{} is Falsy
+set() is Falsy
+() is Falsy
+range(0, 0) is Falsy
+
+```
 
 
