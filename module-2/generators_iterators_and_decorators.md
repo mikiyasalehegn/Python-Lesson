@@ -314,7 +314,7 @@ say_hello()
 Behind the scenes, writing @my_decorator right above say_hello is just shorthand for writing:
 say_hello = my_decorator(say_hello).
 
-## Decorators with Arguments
+### Decorators with Arguments
 
 Often, the functions you want to decorate need to accept arguments (like usernames, numbers, etc.). To handle this, your inner `wrapper` function must accept `*args` and `**kwargs` and pass them along to the original function:
 
