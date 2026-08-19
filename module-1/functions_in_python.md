@@ -864,6 +864,217 @@ def add(a, b):
 print(add.__doc__)
 
 ```
+### 11. Memoization
+
+**Memoization** is an optimization technique that speeds up programs by storing (caching) the results of expensive function calls and returning the cached result when the same inputs occur again.
+When applied to recursive functions, memoization eliminates redundant calculations by transforming repeated execution paths into simple $O(1)$ dictionary lookups.
+
+**The Recursive Problem & Memoization**
+Without memoization, recursive functions with overlapping subproblems evaluate the same state repeatedly.
+For instance, calculating `fib(5)` naively branches into calculating `fib(4)` and `fib(3)`, while `fib(4)` calculates `fib(3)` again. This results in exponential time complexity $O(2^n)$.
+
+**Manual Memoization**
+
+```python
+# Manual Memoization using a dictionary
+def fib_manual(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        return n
+    
+    memo[n] = fib_manual(n - 1, memo) + fib_manual(n - 2, memo)
+    return memo[n]
+```
+
+### What is `@lru_cache`?
+
+In Python, `functools.lru_cache` is a built-in decorator that automates manual dictionary caching. **LRU** stands for **Least Recently Used**, meaning when the cache reaches its maximum size, it automatically discards the least recently accessed entries to free up memory.
+
+```python
+from functools import lru_cache
+
+# maxsize=None allows unbounded cache growth for maximum speed
+@lru_cache(maxsize=None) 
+def fib(n: int) -> int:
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(100))  # Computes instantly!
+```
+
+#### Key Decorator Options:
+
+- **`maxsize` (Managing Memory & Eviction)**
+`maxsize` determines how many unique function results stay stored in RAM. When the cache reaches capacity, `@lru_cache` automatically deletes the **least recently accessed** result to make room for a new one.
+    - **Default (`maxsize=128`):** Safe for general use to prevent unbounded RAM usage.
+    - **`maxsize=None`:** Disables eviction. Everything is cached forever. It runs slightly faster because Python doesn't need to track access timestamps, but it can consume infinite memory if inputs continuously change.
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=2)  # Stores a MAXIMUM of 2 inputs at a time
+def square(n):
+    print(f"Computing square({n})...")
+    return n * n
+
+square(1)  # Miss -> Saved to Cache.  Cache: [1]
+square(2)  # Miss -> Saved to Cache.  Cache: [1, 2]
+square(1)  # HIT!  -> Touched 1.      Cache: [2, 1] (1 is now most recent)
+
+square(3)  # Miss -> Cache is full! Evicts 2 (least recently used). Cache: [1, 3]
+
+square(2)  # Miss! (2 was evicted earlier, so it must be recomputed)
+```
+
+- **`typed` (Distinguishing Argument Types)**
+    
+    In Python, `3` (int) and `3.0` (float) evaluate as equal (`3 == 3.0` is `True`) and share the same hash value.
+    
+    By default (`typed=False`), `@lru_cache` considers `3` and `3.0` to be identical function inputs. Setting `typed=True` forces the cache to treat different data types as completely separate calls.
+    
+    ```python
+    from functools import lru_cache
+    
+    # Default Behavior (typed=False)
+    @lru_cache(maxsize=None, typed=False)
+    def get_type_untyped(x):
+        return f"Result type is {type(x).__name__}"
+    
+    print(get_type_untyped(3))    # Output: Result type is int
+    print(get_type_untyped(3.0))  # Output: Result type is int  <-- CACHED HIT! Returns old int result!
+    
+    # Strict Behavior (typed=True)
+    @lru_cache(maxsize=None, typed=True)
+    def get_type_typed(x):
+        return f"Result type is {type(x).__name__}"
+    
+    print(get_type_typed(3))      # Output: Result type is int
+    print(get_type_typed(3.0))    # Output: Result type is float <-- SEPARATE ENTRY
+    ```
+    
+- **`cache_info()` & `cache_clear()` (Monitoring and Flushing)**
+When you attach `@lru_cache` to a function, Python adds helpful methods directly to that function object.
+    - **`cache_info()`**: Returns a snapshot of how well the cache is performing.
+    - **`cache_clear()`**: Flushes all cached entries from RAM and resets performance counters.
+    
+    ```python
+    from functools import lru_cache
+    
+    @lru_cache(maxsize=128)
+    def add_five(n):
+        return n + 5
+    
+    add_five(10)  # Miss (Computed)
+    add_five(10)  # Hit  (From Cache)
+    add_five(20)  # Miss (Computed)
+    
+    # Check statistics
+    print(add_five.cache_info())
+    # Output: CacheInfo(hits=1, misses=2, maxsize=128, currsize=2)
+    # Explanation:
+    # - hits=1     : Result returned from memory 1 time
+    # - misses=2   : Function actually ran 2 times
+    # - currsize=2 : Currently storing 2 results in RAM
+    
+    # Wipe the cache entirely
+    add_five.cache_clear()
+    
+    print(add_five.cache_info())
+    # Output: CacheInfo(hits=0, misses=0, maxsize=128, currsize=0)
+    ```
+    
+    **When to call `.cache_clear()`:**
+    1. **Memory management:** After finishing a heavy recursive operation, call `fn.cache_clear()` to free up RAM.
+    2. **Dynamic data:** If your function relies on external data (like reading a configuration file or a global setting) that changed, clear the cache so it fetches fresh values.
+    
+    #### The Three Rules of `@lru_cache`
+    
+    1. **Arguments Must Be Hashable:** 
+    
+    Under the hood, `@lru_cache` uses a Python dictionary to map function inputs to their outputs. In Python, dictionary keys must be immutable (hashable). If you pass a mutable object like a `list`, `dict`, or `set`, Python cannot hash it, and the program will crash.
+    
+    **The Error:**
+    
+    ```python
+    from functools import lru_cache
+    
+    @lru_cache(maxsize=None)
+    def sum_numbers(numbers):
+        return sum(numbers)
+    
+    # This will crash:
+    # sum_numbers([1, 2, 3]) 
+    # TypeError: unhashable type: 'list'
+    ```
+    
+    **The Solution:**
+    
+    Convert mutable data structures into their immutable counterparts (`tuple` instead of `list`, `frozenset` instead of `set`) before passing them to the function.
+    
+    ```python
+    # Convert the list to a tuple before calling the cached function
+    my_list = [1, 2, 3]
+    result = sum_numbers(tuple(my_list)) 
+    print(result)  # Output: 6
+    ```
+    
+    2. **Functions Must Be Pure:** 
+    
+    A "pure" function always returns the exact same output for the same input and does not alter anything outside itself. If your function reads a global variable, checks the current time, or generates a random number, caching will destroy its behavior because it will freeze the very first result and blindly return it forever.
+    
+    **The Error:**
+    
+    ```python
+    import random
+    from functools import lru_cache
+    
+    @lru_cache(maxsize=None)
+    def roll_dice(sides):
+        return random.randint(1, sides)
+    
+    print(roll_dice(6))  # Output: 4
+    print(roll_dice(6))  # Output: 4 (Cached!)
+    print(roll_dice(6))  # Output: 4 (Cached! It will never roll again)
+    ```
+    
+    **The Solution:**
+    
+    Only cache functions where the output is 100% determined by the input parameters. If you need dynamic behavior (like randomness or database reads), do not use `@lru_cache` on that specific function.
+    
+    3. **Stack Depth Still Applies:** 
+    
+    Memoization prevents the recursive tree from branching outward (width), but it does not prevent the tree from growing downward (depth). Python has a default recursion limit of exactly 1,000 stack frames. If a recursive path must go 1,001 steps deep to hit its base case, it will crash before the cache ever gets a chance to save a result.
+    
+    **The Error:**
+    
+    ```python
+    from functools import lru_cache
+    
+    @lru_cache(maxsize=None)
+    def sum_up_to(n):
+        if n == 0:
+            return 0
+        return n + sum_up_to(n - 1)
+    
+    # sum_up_to(1500) 
+    # Raises: RecursionError: maximum recursion depth exceeded
+    ```
+    
+    **The Solution:**
+    
+    If you know your recursive depth will exceed 1,000, you must explicitly raise Python's recursion limit using the `sys` module, or rewrite the algorithm using a `while` loop (iteration) instead of recursion.
+    
+    ```python
+    import sys
+    
+    # Increase the allowed depth safely
+    sys.setrecursionlimit(2000)
+    
+    print(sum_up_to(1500))  # Now correctly returns 1125750
+    
+    ```
 
 ✅ So yes — there’s still a lot beyond the basics:
 
