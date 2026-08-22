@@ -735,7 +735,58 @@ Unlike the others, `reduce` is not a built-in; you must import it from the fu
     # Step-by-step: ((1*2)*3)*4 = 24
     ```
     
-    Use code with caution.
+
+`map()`, `filter()`, and `reduce()` accept **any Python iterable**—including tuples, sets, strings, ranges, and dictionaries.
+
+#### A. Tuples & Sets
+
+When you pass a tuple or set, the functions process elements one by one. You wrap the final result in `tuple()` or `set()` depending on the type you want back:
+
+```python
+# TUPLE: Filter even numbers from a tuple
+point_tuple = (1, 2, 3, 4, 5)
+evens = tuple(filter(lambda x: x % 2 == 0, point_tuple))
+# Output: (2, 4)
+
+# SET: Map values in a set to their square
+unique_nums = {1, 2, 3}
+squares = set(map(lambda x: x ** 2, unique_nums))
+# Output: {1, 4, 9}
+```
+
+#### B. Strings
+
+Strings are iterables of individual characters:
+
+```python
+# Filter out non-vowels from a string
+text = "hello world"
+vowels_only = "".join(filter(lambda c: c in "aeiou", text))
+# Output: "eo"
+```
+
+#### C. Dictionaries
+
+When you pass a dictionary directly to `map()` or `filter()`, Python loops over its **keys** by default. To work with key-value pairs, use `.items()`, `.keys()`, or `.values()`:
+
+```python
+from functools import reduce
+
+prices = {"apple": 0.5, "banana": 0.25, "cherry": 1.5}
+
+# Filter dictionary items where price > 0.40
+expensive_items = dict(filter(lambda item: item[1] > 0.40, prices.items()))
+# Output: {'apple': 0.5, 'cherry': 1.5}
+
+# Map 10% discount across dictionary values
+discounted_prices = dict(map(lambda item: (item[0], item[1] * 0.9), prices.items()))
+# Output: {'apple': 0.45, 'banana': 0.225, 'cherry': 1.35}
+
+# Reduce a dictionary to find the total sum of its values
+sales = {"q1": 100, "q2": 150, "q3": 200}
+total_sales = reduce(lambda acc, val: acc + val, sales.values())
+# Output: 450
+```
     
 
 ### 3. **Closures**
