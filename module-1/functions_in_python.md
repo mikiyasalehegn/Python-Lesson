@@ -656,7 +656,8 @@ print(factorial(5))  # 120
 
 ### 1. **Lambda Functions (Anonymous Functions)**
 
-- Functions without a name, usually one line.
+- A lambda function in Python is a small, anonymous function defined without a name using the lambda keyword. It can only contain a single expression and automatically returns its evaluated result.
+
 
 ```python
 square = lambda x: x ** 2
