@@ -810,20 +810,27 @@ print(double(5))  # 10
 
 ### 4. **Decorators**
 
-- Special functions that **wrap another function** to add extra behavior.
-
+- A decorator in Python is a design pattern that allows you to add or modify the behavior of a function or method without changing its actual source code.
 ```python
-def debug(func):
-    def wrapper(*args, **kwargs):
-        print(f"Calling {func.__name__} with {args} {kwargs}")
-        return func(*args, **kwargs)
+def my_decorator(func):
+    def wrapper():
+        print("--- Before the function runs ---")
+        func()  # Calls the original function
+        print("--- After the function runs ---")
     return wrapper
 
-@debug
-def add(a, b):
-    return a + b
+# Using the '@' syntactic sugar
+@my_decorator
+def say_hello():
+    print("Hello, World!")
 
-print(add(2, 3))
+# Calling the decorated function
+say_hello()
+
+# output 
+# --- Before the function runs ---
+# Hello, World!
+# --- After the function runs ---
 ```
 
 ✅ Often used in logging, authentication, caching.
