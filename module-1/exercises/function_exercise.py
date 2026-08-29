@@ -232,7 +232,61 @@ from functools import lru_cache
 #
 # print(f'cached:{cached_fib}, cached_fib_len: {cached_fib_len:.6f}')
 # print(f'uncached_fib: {uncached_fib}, uncached_fib_len: {uncached_fib_len:.6f}')
-# -------------------------------------------------------------------------------------------------------------------
+# *******************************************************************************************************************
+# You are climbing a staircase with n steps. You are given an array cost where cost[i] represents the price of step i.
+# Once paid, you can take 1 or 2 steps. You can start at index 0 or index 1.
+# Write a function min_cost_climbing_stairs(cost) that returns the minimum total cost to reach the top
+# (past the end of the array).Example 1: cost = [10, 15, 20]  Output: 15 (Pay 15 at index 1 right arrow
+# step 2 steps to the top)Example 2: cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1] : 6
+# from functools import lru_cache
+#
+# cost_step = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
+#
+# @lru_cache(maxsize=None)
+# def min_cost_climbing_stairs(cost):
+#     for index, cost in enumerate(cost_step):
+#         total_price = min_cost_climbing_stairs(cost)
+# *******************************************************************************************************************
+# You are climbing a staircase with n steps. You are given an array cost where cost[i] represents the price of step i.
+# Once paid, you can take 1 or 2 steps. You can start at index 0 or index 1.
+# cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
+# def min_cost_climbing_stairs(costs: list)-> int:
+#     def cost_steps(index):
+#         if index >= len(costs):
+#             return 0
+#         min_cost_one_step = cost_steps(index)
+#         min_cost_two_steps = cost_steps(index + 1)
+
+from functools import lru_cache
+
+memo={}
+def min_cost_climbing_stairs(cost: list[int]) -> int:
+    # @lru_cache(maxsize=None)
+    def min_cost_from(index: int) -> int:
+        # Base Case: Reached or passed the top of the stairs
+        if index >= len(cost):
+            return 0
+
+        # Choice: Pay current step cost, then pick the cheaper path (1 step or 2 steps)
+        take_one_step = min_cost_from(index + 1)
+        take_two_steps = min_cost_from(index + 2)
+        result = cost[index] + min(take_one_step, take_two_steps)
+        memo[index] = result
+        return result
+
+    # You can start at index 0 OR index 1
+    total_cost = min(min_cost_from(0), min_cost_from(1))
+
+    # Print cache statistics to inspect performance
+    print(memo)
+
+    return total_cost
+
+# print("Test 1 Result:", min_cost_climbing_stairs([10, 15, 20]))
+print("\nTest 2 Result:", min_cost_climbing_stairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]))
+
+
+# *******************************************************************************************************************
 # -------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------
