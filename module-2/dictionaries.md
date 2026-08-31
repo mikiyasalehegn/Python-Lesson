@@ -8,7 +8,6 @@
 
 Think of it like a **real dictionary**: word = key, meaning = value.
 
----
 
 ### 🔹 Creating Dictionaries
 
