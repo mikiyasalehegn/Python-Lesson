@@ -235,3 +235,111 @@ print(b)  # [2, 3, 4]
 print(c)  # 5
 
 ```
+
+### 🔹 **Tuples in Dictionaries & Sets**
+
+Since tuples are hashable (if they only contain hashable elements), they’re often used as **composite keys**:
+
+```python
+students = {("John", "Doe"): 90, ("Jane", "Smith"): 85}
+print(students[("John", "Doe")])  # 90
+
+```
+
+### 🔹 **Immutability Trick**
+
+Even though tuples are immutable, if they contain a mutable object (like a list), that inner object can change:
+
+```python
+t = (1, [2, 3])
+t[1].append(4)
+print(t)  # (1, [2, 3, 4])
+
+```
+
+### 🔹 **Nested Tuples**
+
+Tuples can contain other tuples (and lists, dicts, etc.):
+
+```python
+point3D = (1, (2, 3), (4, 5, 6))
+print(point3D[1][1])  # 3
+
+```
+
+### 🔹 **Named Tuples** (from `collections`)
+
+`namedtuple` gives tuples **field names** for readability.
+
+```python
+from collections import namedtuple
+
+Point = namedtuple("Point", ["x", "y"])
+p = Point(10, 20)
+print(p.x, p.y)   # 10 20
+
+```
+
+This is like a **lightweight class** without methods.
+
+- **More on named tuples**
+    
+    A **Named Tuple** is a specialized version of a standard Python tuple that allows you to access elements using descriptive names (like `point.x`) instead of just integer indices (like `point[0]`). They are part of the `collections` module and are essentially lightweight, immutable classes.
+    
+    **1. How to Create and Use a Named Tuple**
+    
+    To create one, use the `namedtuple` factory function from the `collections` module.
+    
+    **python**
+    
+    `from collections import namedtuple
+    
+    ### 1. Define the "blueprint" (Class Name, [Field Names])
+    Point = namedtuple('Point', ['x', 'y'])
+    
+    ### 2. Create an instance
+    p = Point(10, 20)
+    
+    ### 3. Access values in multiple ways:
+    print(p.x)       # Dot notation (Readable!) -> 10
+    print(p[1])      # Positional index (Classic tuple style) -> 20
+    x, y = p         # Unpacking -> 10, 20`
+
+    
+**2. Key Features**
+
+- **Immutability:** Like regular tuples, you cannot change values once created. To "update" a field, you must create a new instance using the `._replace()` method.
+- **Memory Efficient:** They use no more memory than regular tuples and are much more efficient than dictionaries.
+- **Dual Access:** They support both positional indexing and attribute name access.
+- **Default Values:** Since Python 3.7, you can provide default values for fields using the `defaults` argument.
+
+**3. Built-in Utility Methods**
+
+Named tuples include several "hidden" helper methods (starting with an underscore to avoid name conflicts):
+
+- **`._asdict()`**: Returns an `OrderedDict` of the contents.
+- **`._make(iterable)`**: Creates a new instance from an existing list or tuple.
+- **`._fields`**: Returns a tuple of the field names for introspection.
+
+**4. Modern Alternative: `typing.NamedTuple`**
+
+For 2026 standards, many developers prefer the `typing.NamedTuple` syntax, which supports **type hints** and looks more like a standard class.
+    
+```python
+from typing import NamedTuple
+    
+class User(NamedTuple):
+    id: int
+    username: str
+    is_active: bool = True
+
+new_user = User(1, "python_dev")
+print(new_user.username)  # "python_dev"
+
+```
+    
+
+**When to use Named Tuples?**
+    
+Use them for **simple, immutable data structures** (like coordinates, database records, or function results) where you want the speed and safety of a tuple but the readability of a class. If you need complex logic or the ability to change data after creation, consider a Data Class instead
+
