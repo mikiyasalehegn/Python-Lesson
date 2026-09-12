@@ -259,34 +259,155 @@ from functools import lru_cache
 
 from functools import lru_cache
 
-memo={}
-def min_cost_climbing_stairs(cost: list[int]) -> int:
+# memo={}
+# def min_cost_climbing_stairs(cost: list[int]) -> int:
     # @lru_cache(maxsize=None)
-    def min_cost_from(index: int) -> int:
+    # def min_cost_from(index: int) -> int:
         # Base Case: Reached or passed the top of the stairs
-        if index >= len(cost):
-            return 0
+        # if index >= len(cost):
+        #     return 0
 
         # Choice: Pay current step cost, then pick the cheaper path (1 step or 2 steps)
-        take_one_step = min_cost_from(index + 1)
-        take_two_steps = min_cost_from(index + 2)
-        result = cost[index] + min(take_one_step, take_two_steps)
-        memo[index] = result
-        return result
+        # take_one_step = min_cost_from(index + 1)
+        # take_two_steps = min_cost_from(index + 2)
+        # result = cost[index] + min(take_one_step, take_two_steps)
+        # memo[index] = result
+        # return result
 
     # You can start at index 0 OR index 1
-    total_cost = min(min_cost_from(0), min_cost_from(1))
+    # total_cost = min(min_cost_from(0), min_cost_from(1))
 
     # Print cache statistics to inspect performance
-    print(memo)
+    # print(memo)
 
-    return total_cost
+    # return total_cost
 
 # print("Test 1 Result:", min_cost_climbing_stairs([10, 15, 20]))
-print("\nTest 2 Result:", min_cost_climbing_stairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]))
+# print("\nTest 2 Result:", min_cost_climbing_stairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]))
 
 
 # *******************************************************************************************************************
-# -------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------------------
+# Given a list of (name, age) tuples, sort them in ascending order by age using sorted() with a lambda as the key
+# argument. Then sort the same list in descending order by age.
+
+# people = [("Alice", 30), ("Bob", 25), ("Charlie", 35), ("Diana", 28)]
+# order_by_age = sorted(people, key=lambda person: person[1], reverse=True)
+# print(order_by_age)
+
+# *******************************************************************************************************************
+# Use map() with a lambda to convert a list of temperatures from Celsius to Fahrenheit. The conversion formula is
+# F = (C × 9/5) + 32. Collect the results into a new list and print it.
+
+# celsius = [0, 20, 37, 100]
+# fahrenheit = list(map(lambda temp: (temp * 9/5) + 32, celsius))
+# print(fahrenheit)
+
+# *******************************************************************************************************************
+# Use functools.reduce() with a lambda to find the product of all numbers in a list. The function should multiply each
+# element cumulatively from left to right until a single value remains.
+# from functools import reduce
+#
+# numbers = [1, 2, 3, 4, 5]
+# products = reduce(lambda a, b: a*b, numbers)
+# print(products)
+# *******************************************************************************************************************
+#  Write a lambda that takes a single integer and returns the string "even" if the number is divisible by 2, or "odd"
+#  otherwise. Assign it to a variable named parity and test it on several values.
+# even_or_odd = lambda num: "even" if num % 2 == 0 else "odd"
+# print(even_or_odd(50))
+# *******************************************************************************************************************
+# operators = {
+#     "add": lambda a, b : a+b,
+#     "sub": lambda a, b : a-b,
+#     "mul": lambda a, b : a*b,
+#     "div": lambda a, b : round(a/b, 2),
+# }
+#
+# x,y = 5,6
+
+# for operation, func in operators.items():
+#     print(f'{operation} {x} and {y} = {func(x,y)}')
+
+# addition = operators["add"](2,4)
+# print(addition)
+
+# *******************************************************************************************************************
+# Given a list of employee dictionaries, each with a "name" and a "salary" key, sort the list by salary in descending order.
+# Where two employees share the same salary, sort those entries by name in ascending alphabetical order.
+# Use a single lambda as the key argument.
+
+# employees = [
+#     {"name": "Alice", "salary": 70000},
+#     {"name": "Bob", "salary": 90000},
+#     {"name": "Charlie", "salary": 70000},
+#     {"name": "Diana", "salary": 90000}
+# ]
+#
+# sorted_employees = sorted(employees, key=lambda employee: (-employee['salary'], employee['name']))
+# print(sorted_employees)
+
+# *******************************************************************************************************************
+# Write a general multiply(x, n) function that returns x * n. Use functools.partial() to create two specialised
+# functions from it: double(x), which always multiplies by 2, and triple(x), which always multiplies by 3.
+# Call both with several values.
+# from functools import partial
+#
+# def multiply(x, n):
+#     return x*n
+#
+# double = partial(multiply, 2)
+# print(double(2))
+# triple = partial(multiply, 3)
+# print(triple(4))
+
+# *******************************************************************************************************************
+# Write a compose(f, g) utility function that returns a new function equivalent to applying g first and then f to the
+# result — that is, compose(f, g)(x) should equal f(g(x)). Test it by composing a lambda that doubles a number
+# with a lambda that adds 3.
+
+# def compose(f, g):
+#     return lambda x: f(g(x))
+#
+# add_two_first = lambda x: x + 2
+# double_next = lambda x: 2*x
+#
+# result = compose(g=add_two_first, f=double_next)
+# print(result(3))
+
+# *******************************************************************************************************************
+# Given a list of lists, use functools.reduce() with a lambda to flatten it into a single list.
+# Do not use any for loops, list comprehensions, or itertools.
+# from functools import reduce
+#
+# nested = [[1, 2, 3], [4, 5], [6, 7, 8, 9]]
+#
+# flatten_list = list(reduce(lambda x, y: x+y , nested))
+# print(flatten_list)
+
+# *******************************************************************************************************************
+# Given a list of strings, sort them alphabetically by their last character using a lambda as the key argument to
+# sorted(). Where two strings end with the same character, preserve their original relative order.
+# words = ["banana", "apple", "cherry", "date", "fig", "kiwi"]
+# ordered_words = sorted(words, key=lambda word: (word[-1], word[0]))
+# print(ordered_words)
+
+# *******************************************************************************************************************
+# Implement your own versions of my_map(func, lst), my_filter(pred, lst), and my_reduce(func, lst, initial) from scratch
+# using only recursion and lambdas. No loops, no built-in map/filter/reduce, and no list comprehensions.
+# Verify each against a known input.
+# numbers = [1, 2, 3, 4, 5]
+
+# def my_map(func, iterable):
+#     lst = []
+#     if iterable:
+#         for item in iterable:
+#             lst.append(func(item))
+#     return lst
+#
+# double_items = my_map(lambda a: a*2, numbers)
+# print(double_items)
+
+# *******************************************************************************************************************
+# *******************************************************************************************************************
+# *******************************************************************************************************************
+# *******************************************************************************************************************
